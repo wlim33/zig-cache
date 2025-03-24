@@ -1,10 +1,6 @@
 const std = @import("std");
 const Allocator = std.mem.Allocator;
 
-const Error = error{
-    AddError,
-};
-
 pub fn Cache(comptime K: type, comptime V: type) type {
     const Item = struct {
         v: V,
