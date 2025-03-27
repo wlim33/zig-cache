@@ -19,11 +19,12 @@ pub fn LinkedList(comptime T: type) type {
         current: ?*Node(T),
         const Self = @This();
         pub fn next(self: *Self) ?*const Node(T) {
-            const oldCurrent = self.current;
-            if (oldCurrent) |cur| {
+            if (self.current) |cur| {
                 self.current = cur.next;
+                return cur;
+            } else {
+                return null;
             }
-            return oldCurrent;
         }
     };
 
@@ -34,8 +35,10 @@ pub fn LinkedList(comptime T: type) type {
             const oldCurrent = self.current;
             if (oldCurrent) |cur| {
                 self.current = cur.before;
+                return cur;
+            } else {
+                return null;
             }
-            return oldCurrent;
         }
     };
 
@@ -196,6 +199,9 @@ fn checkBothDirections(
 ) !void {
     try checkBackward(T, values, list);
     try checkForward(T, values, list);
+
+    try std.testing.expectEqual(values[0], list.head.?.val);
+    try std.testing.expectEqual(values[values.len - 1], list.tail.?.val);
 }
 
 test "basic init" {
@@ -312,6 +318,17 @@ test "remove middle" {
     var l = [_]u8{ 4, 2, 1 };
 
     try checkBothDirections(u8, &l, &ll);
+
+    ll.remove(&n_2);
+    try std.testing.expectEqual(2, ll.len);
+    var l_2 = [_]u8{ 4, 1 };
+
+    try checkBothDirections(u8, &l_2, &ll);
+    ll.remove(&n_1);
+    try std.testing.expectEqual(1, ll.len);
+    var l_3 = [_]u8{4};
+
+    try checkBothDirections(u8, &l_3, &ll);
 }
 
 test "push head, pop tail (queue)" {
@@ -334,6 +351,8 @@ test "push head, pop tail (queue)" {
 
         var values = [_]u8{ 3, 2 };
         try checkBothDirections(u8, &values, &ll);
+    } else {
+        try std.testing.expectEqual(0, 1);
     }
     if (ll.popTail()) |node| {
         try std.testing.expectEqual(2, node.val);
@@ -341,7 +360,10 @@ test "push head, pop tail (queue)" {
         try std.testing.expectEqual(null, node.next);
         var values = [_]u8{3};
         try checkBothDirections(u8, &values, &ll);
+    } else {
+        try std.testing.expectEqual(0, 1);
     }
+
     if (ll.popTail()) |node| {
         try std.testing.expectEqual(3, node.val);
         try std.testing.expectEqual(null, node.before);
@@ -349,6 +371,8 @@ test "push head, pop tail (queue)" {
         try std.testing.expectEqual(0, ll.len);
         try std.testing.expectEqual(null, ll.head);
         try std.testing.expectEqual(null, ll.tail);
+    } else {
+        try std.testing.expectEqual(0, 1);
     }
 }
 
@@ -372,7 +396,10 @@ test "push head, pop head (stack)" {
 
         var values = [_]u8{ 2, 1 };
         try checkBothDirections(u8, &values, &ll);
+    } else {
+        try std.testing.expectEqual(null, 1);
     }
+
     if (ll.popHead()) |node| {
         try std.testing.expectEqual(2, node.val);
         try std.testing.expectEqual(null, node.before);
@@ -380,7 +407,10 @@ test "push head, pop head (stack)" {
 
         var values = [_]u8{1};
         try checkBothDirections(u8, &values, &ll);
+    } else {
+        try std.testing.expectEqual(null, 1);
     }
+
     if (ll.popHead()) |node| {
         try std.testing.expectEqual(1, node.val);
         try std.testing.expectEqual(null, node.before);
@@ -388,6 +418,8 @@ test "push head, pop head (stack)" {
         try std.testing.expectEqual(0, ll.len);
         try std.testing.expectEqual(null, ll.head);
         try std.testing.expectEqual(null, ll.tail);
+    } else {
+        try std.testing.expectEqual(null, 1);
     }
 }
 
@@ -411,14 +443,20 @@ test "push tail, pop tail (stack)" {
 
         var values = [_]u8{ 1, 2 };
         try checkBothDirections(u8, &values, &ll);
+    } else {
+        try std.testing.expectEqual(null, 1);
     }
+
     if (ll.popTail()) |node| {
         try std.testing.expectEqual(2, node.val);
         try std.testing.expectEqual(null, node.before);
         try std.testing.expectEqual(null, node.next);
         var values = [_]u8{1};
         try checkBothDirections(u8, &values, &ll);
+    } else {
+        try std.testing.expectEqual(null, 1);
     }
+
     if (ll.popTail()) |node| {
         try std.testing.expectEqual(1, node.val);
         try std.testing.expectEqual(null, node.before);
@@ -426,6 +464,8 @@ test "push tail, pop tail (stack)" {
         try std.testing.expectEqual(0, ll.len);
         try std.testing.expectEqual(null, ll.head);
         try std.testing.expectEqual(null, ll.tail);
+    } else {
+        try std.testing.expectEqual(null, 1);
     }
 }
 
@@ -449,14 +489,20 @@ test "push tail, pop head (queue)" {
 
         var values = [_]u8{ 2, 3 };
         try checkBothDirections(u8, &values, &ll);
+    } else {
+        try std.testing.expectEqual(null, 1);
     }
+
     if (ll.popHead()) |node| {
         try std.testing.expectEqual(2, node.val);
         try std.testing.expectEqual(null, node.before);
         try std.testing.expectEqual(null, node.next);
         var values = [_]u8{3};
         try checkBothDirections(u8, &values, &ll);
+    } else {
+        try std.testing.expectEqual(null, 1);
     }
+
     if (ll.popHead()) |node| {
         try std.testing.expectEqual(3, node.val);
         try std.testing.expectEqual(null, node.before);
@@ -464,5 +510,72 @@ test "push tail, pop head (queue)" {
         try std.testing.expectEqual(0, ll.len);
         try std.testing.expectEqual(null, ll.head);
         try std.testing.expectEqual(null, ll.tail);
+    } else {
+        try std.testing.expectEqual(null, 1);
     }
+}
+
+test "remove and add to head" {
+    var ll: LinkedList(u8) = LinkedList(u8){};
+    var n_1 = Node(u8){ .val = 1 };
+    ll.pushTail(&n_1);
+    var n_2 = Node(u8){ .val = 2 };
+    ll.pushTail(&n_2);
+    var n_3 = Node(u8){ .val = 3 };
+    ll.pushTail(&n_3);
+
+    try std.testing.expectEqual(3, ll.len);
+
+    var init_values = [_]u8{ 1, 2, 3 };
+    try checkBothDirections(u8, &init_values, &ll);
+
+    ll.remove(&n_2);
+    ll.pushHead(&n_2);
+
+    var values = [_]u8{ 2, 1, 3 };
+    try checkBothDirections(u8, &values, &ll);
+}
+test "remove tail and add to head" {
+    var ll: LinkedList(u8) = LinkedList(u8){};
+    var n_1 = Node(u8){ .val = 1 };
+    ll.pushTail(&n_1);
+    var n_2 = Node(u8){ .val = 2 };
+    ll.pushTail(&n_2);
+    var n_3 = Node(u8){ .val = 3 };
+    ll.pushTail(&n_3);
+
+    try std.testing.expectEqual(3, ll.len);
+
+    var init_values = [_]u8{ 1, 2, 3 };
+    try checkBothDirections(u8, &init_values, &ll);
+
+    ll.remove(&n_3);
+    ll.pushHead(&n_3);
+
+    var values = [_]u8{ 3, 1, 2 };
+    try checkBothDirections(u8, &values, &ll);
+}
+
+test "remove tail and add to head (heap)" {
+    var ll: LinkedList(u8) = LinkedList(u8){};
+
+    const n_1 = try std.testing.allocator.create(Node(u8));
+    n_1.*.val = 1;
+    defer std.testing.allocator.destroy(n_1);
+    ll.pushTail(n_1);
+    var n_2 = Node(u8){ .val = 2 };
+    ll.pushTail(&n_2);
+    var n_3 = Node(u8){ .val = 3 };
+    ll.pushTail(&n_3);
+
+    try std.testing.expectEqual(3, ll.len);
+
+    var init_values = [_]u8{ 1, 2, 3 };
+    try checkBothDirections(u8, &init_values, &ll);
+
+    ll.remove(&n_3);
+    ll.pushHead(&n_3);
+
+    var values = [_]u8{ 3, 1, 2 };
+    try checkBothDirections(u8, &values, &ll);
 }
