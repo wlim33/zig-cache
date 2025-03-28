@@ -18,7 +18,7 @@ pub fn LinkedList(comptime T: type) type {
     const Iterator = struct {
         current: ?*Node(T),
         const Self = @This();
-        pub fn next(self: *Self) ?*const Node(T) {
+        pub fn next(self: *Self) ?*Node(T) {
             if (self.current) |cur| {
                 self.current = cur.next;
                 return cur;
@@ -31,7 +31,7 @@ pub fn LinkedList(comptime T: type) type {
     const TailIterator = struct {
         current: ?*Node(T),
         const Self = @This();
-        pub fn next(self: *Self) ?*const Node(T) {
+        pub fn next(self: *Self) ?*Node(T) {
             const oldCurrent = self.current;
             if (oldCurrent) |cur| {
                 self.current = cur.before;
