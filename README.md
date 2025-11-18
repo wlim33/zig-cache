@@ -19,13 +19,12 @@ Small playground of cache eviction strategies implemented in Zig 0.15. Each cach
 ### Run all tests
 
 ```sh
-cd /Users/williamlim/Projects/zig-cache/zig-cache
-for f in src/*.zig; do zig test "$f"; done
+zig test src/basic.zig src/lru.zig src/fifo.zig src/mru.zig src/random.zig src/lfu.zig src/clock.zig src/TwoQueueCache.zig
 ```
 
 ### Benchmark the basic LRU
 
-Use the new CLI flags to override the default `--size 1000 --count 100000`:
+Use CLI flags to override the default `--size 1000 --count 100000`:
 
 ```sh
 cd /Users/williamlim/Projects/zig-cache/zig-cache
@@ -44,4 +43,3 @@ done
 ```
 
 The benchmark seeds its own PRNG and prints hit/miss ratios for each run.
-
