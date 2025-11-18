@@ -58,13 +58,6 @@ pub fn Cache(comptime K: type, comptime V: type) type {
     };
 }
 
-test "example test" {
-    var list = std.ArrayList(i32).init(std.testing.allocator);
-    defer list.deinit();
-    try list.append(12);
-    try std.testing.expectEqual(@as(i32, 12), list.pop());
-}
-
 test "delete expired test" {
     var cache = Cache(u8, u8).init(std.testing.allocator, 12);
     defer cache.deinit();

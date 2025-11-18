@@ -29,10 +29,12 @@ pub fn LRUCache(comptime K: type, comptime V: type) type {
         }
 
         pub fn evictLeastUsed(self: *Self) void {
-            const leastUsed = self.list.popTail();
-            if (self.map.remove(leastUsed.?.val.key)) {
-                self.on_evict(leastUsed.?.val.key, leastUsed.?.val.value);
-                self.allocator.destroy(leastUsed.?);
+            if (self.list.popTail()) |node| {
+                const key = node.val.key;
+                const value = node.val.value;
+                _ = self.map.remove(key);
+                self.on_evict(key, value);
+                self.allocator.destroy(node);
             }
         }
 
@@ -41,8 +43,6 @@ pub fn LRUCache(comptime K: type, comptime V: type) type {
                 _ = self.map.remove(key);
                 self.list.remove(ptr);
                 self.allocator.destroy(ptr);
-            } else {
-                return null;
             }
         }
 
@@ -76,7 +76,10 @@ pub fn LRUCache(comptime K: type, comptime V: type) type {
         }
 
         pub fn getOldest(self: *Self) ?V {
-            return self.list.tail.?.*.val.value;
+            if (self.list.tail) |tail_node| {
+                return tail_node.*.val.value;
+            }
+            return null;
         }
 
         pub fn put(self: *Self, key: K, value: V) !void {
